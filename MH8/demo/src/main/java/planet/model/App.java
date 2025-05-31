@@ -10,7 +10,6 @@ import javafx.scene.Parent;
 import javafx.scene.PerspectiveCamera;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.PhongMaterial;
 import javafx.scene.shape.Sphere;
@@ -40,6 +39,7 @@ public class App extends Application {
         stage.setTitle("test");
 
         // create sphere and move it to center of screen
+        // create all of the planets in the solar system
         Sphere test = PlanetTemplate(20, MERCURY_MATERIAL, 250, 500, 100, 3);
 
         // Camera object
@@ -53,19 +53,37 @@ public class App extends Application {
         s.setFill(Color.BLACK);
 
         // how we are handling key presses here
-        stage.addEventHandler(MouseEvent.MOUSE_PRESSED, event -> {
-            switch (event.getCode()) {
-                case MOUSE_PRESSED:
-                    g.translateXProperty().set(g.getTranslateX() + 10);
-                    g.translateYProperty().set(g.getTranslateY() + 10);
-                    break;
+        stage.addEventHandler(KeyEvent.KEY_PRESSED, event2 -> {
+            switch (event2.getCode()) {
                 case W:
                     g.translateZProperty().set(g.getTranslateZ() + 10);
                     break;
                 case S:
                     g.translateZProperty().set(g.getTranslateZ() - 10);
+                    break;
             }
         });
+
+        // mouse events
+        final double[] mouseAnchorX = new double[1];
+        final double[] mouseAnchorY = new double[1];
+        final double[] initTranslX = new double[1];
+        final double[] initTranslY = new double[1];
+        
+        g.setOnMousePressed(event -> {
+            mouseAnchorX[0] = event.getSceneX();
+            mouseAnchorY[0] = event.getSceneY();
+            initTranslX[0] =  g.getTranslateX();
+            initTranslY[0] = g.getTranslateY();
+        });
+
+        g.setOnMouseDragged(event -> {
+            double deltaX = event.getSceneX() - mouseAnchorX[0];
+            double deltaY = event.getSceneY() - mouseAnchorY[0];
+            g.setTranslateX(initTranslX[0] + deltaX);
+            g.setTranslateY(initTranslY[0] + deltaY);
+        });
+        
         s.setCamera(cam);
 
         g.getChildren().add(test);
